@@ -3,10 +3,12 @@
 Golang publish/subscribe library
 
 ## Intall
-Use [dep](https://github.com/golang/dep) tool:
+We recommend to use [dep](https://github.com/golang/dep) tool:
 ```bash
-$ dep ensure -add github.com/gigovich/dep
+$ dep ensure -add github.com/gigovich/pubsubs
 ```
+or just `go get github.com/gigovich/pubsubs` if you don't need package management.
+
 
 ## Example
 This program posts 10 times tick, every 1 second, for 5 subscribers:
@@ -21,7 +23,7 @@ import (
 	"time"
 )
 
-const tickSubscriptionName = "tickSubscription"
+const tickSubscriptionID = "tickSubscription"
 
 // broker can used as global registry of subscriptions
 var broker = pubsubs.New()
@@ -30,7 +32,7 @@ var broker = pubsubs.New()
 func subscribe(wg *sync.WaitGroup, num int) {
 	defer wg.Done()
 
-	subsc, err := broker.Subscribe(tickSubscriptionName)
+	subsc, err := broker.Subscribe(tickSubscriptionID)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -46,8 +48,8 @@ func subscribe(wg *sync.WaitGroup, num int) {
 }
 
 func main() {
-	// create subscription by
-	subsc := pubsubs.NewSubscription(tickSubscriptionName)
+	// create subscription by it ID
+	subsc := pubsubs.NewSubscription(tickSubscriptionID)
 	if err := broker.Publish(subsc); err != nil {
 		panic(err.Error())
 	}
