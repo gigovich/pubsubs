@@ -1,4 +1,4 @@
-# Publish/Subscribe
+# Golang PUB/SUBS package
 
 Golang publish/subscribe library
 
@@ -11,7 +11,7 @@ $ dep ensure -add github.com/gigovich/dep
 ## Example
 This program posts 10 times tick, every 1 second, for 5 subscribers:
 
-```
+```go
 package main
 
 import (
