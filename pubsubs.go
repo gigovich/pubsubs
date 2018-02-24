@@ -4,57 +4,57 @@ import (
 	"fmt"
 )
 
-// ErrNoSuchSubscription error returned when subscription with such id not found
-var ErrNoSuchSubscription = fmt.Errorf("no such subscription")
+// ErrNoSuchTopic error returned when topic with such id not found
+var ErrNoSuchTopic = fmt.Errorf("no such topic")
 
-// ErrSubscriptionExists error returned when you try to pass subscrition to broker but it already exists in it
-var ErrSubscriptionExists = fmt.Errorf("subscription already exists")
+// ErrTopicExists error returned when you try to add topic to broker but it already exists in it
+var ErrTopicExists = fmt.Errorf("topic already exists")
 
 // Broker for publishers and subscribers
 type Broker struct {
-	subscriptions map[string]*Subscription
+	topics map[string]*Topic
 }
 
 // New broker instance constructor
 func New() *Broker {
 	return &Broker{
-		subscriptions: make(map[string]*Subscription),
+		topics: make(map[string]*Topic),
 	}
 }
 
-// Publish subscription
-func (b *Broker) Publish(subscription *Subscription) error {
-	if _, ok := b.subscriptions[subscription.id]; !ok {
-		b.subscriptions[subscription.id] = subscription
+// Add topic
+func (b *Broker) Add(topic *Topic) error {
+	if _, ok := b.topics[topic.id]; !ok {
+		b.topics[topic.id] = topic
 		return nil
 	}
 
-	return ErrSubscriptionExists
+	return ErrTopicExists
 }
 
-// Unpublish subscription
-func (b *Broker) Unpublish(subscription *Subscription) error {
-	if _, ok := b.subscriptions[subscription.id]; ok {
-		subscription.UnsubscribeAll()
-		delete(b.subscriptions, subscription.id)
+// Remove topic
+func (b *Broker) Remove(topic *Topic) error {
+	if _, ok := b.topics[topic.id]; ok {
+		topic.UnsubscribeAll()
+		delete(b.topics, topic.id)
 		return nil
 	}
-	return ErrNoSuchSubscription
+	return ErrNoSuchTopic
 }
 
 // Subscribe for event by hash
-func (b *Broker) Subscribe(id string) (*Subscriber, error) {
-	if subscription, ok := b.subscriptions[id]; ok {
-		return subscription.Subscribe(), nil
+func (b *Broker) Subscribe(id string) (*Subscription, error) {
+	if topic, ok := b.topics[id]; ok {
+		return topic.Subscribe(), nil
 	}
-	return nil, ErrNoSuchSubscription
+	return nil, ErrNoSuchTopic
 }
 
 // Unsubscribe subscriber from broker
-func (b *Broker) Unsubscribe(subscriber *Subscriber) error {
-	if subscription, ok := b.subscriptions[subscriber.SubsID]; ok {
-		subscription.Unsubscribe(subscriber)
+func (b *Broker) Unsubscribe(subscription *Subscription) error {
+	if topic, ok := b.topics[subscription.topicID]; ok {
+		topic.Unsubscribe(subscription)
 		return nil
 	}
-	return ErrNoSuchSubscription
+	return ErrNoSuchTopic
 }

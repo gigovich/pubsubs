@@ -1,5 +1,7 @@
 # Golang PUB/SUBS package
 
+NOTE: alpha, interface will be changed
+
 Golang publish/subscribe library
 
 ## Intall
@@ -23,7 +25,7 @@ import (
 	"time"
 )
 
-const tickSubscriptionID = "tickSubscription"
+const tickTopicID = "tickTopic"
 
 // broker can used as global registry of subscriptions
 var broker = pubsubs.New()
@@ -32,7 +34,7 @@ var broker = pubsubs.New()
 func subscribe(wg *sync.WaitGroup, num int) {
 	defer wg.Done()
 
-	subsc, err := broker.Subscribe(tickSubscriptionID)
+	subsc, err := broker.Subscribe(tickTopicID)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -49,8 +51,8 @@ func subscribe(wg *sync.WaitGroup, num int) {
 
 func main() {
 	// create subscription by it ID
-	subsc := pubsubs.NewSubscription(tickSubscriptionID)
-	if err := broker.Publish(subsc); err != nil {
+	topic := pubsubs.NewTopic(tickTopicID)
+	if err := broker.Add(topic); err != nil {
 		panic(err.Error())
 	}
 
@@ -71,10 +73,10 @@ func main() {
 			fmt.Println("--- New tick ---")
 
 			// publish tick value
-			subsc.Publish(time.Now())
+			topic.Publish(time.Now())
 		}
 
-		if err := broker.Unpublish(subsc); err != nil {
+		if err := broker.Remove(topic); err != nil {
 			panic(err.Error())
 		}
 	}()

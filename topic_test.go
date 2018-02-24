@@ -5,8 +5,8 @@ import (
 	"time"
 )
 
-func TestSubscription(t *testing.T) {
-	s := NewSubscription("test")
+func TestTopic(t *testing.T) {
+	s := NewTopic("test")
 	sb := s.Subscribe()
 	go s.Publish("message")
 	select {
@@ -27,7 +27,7 @@ func TestSubscription(t *testing.T) {
 		return
 	}
 
-	if len(s.Subscribers) != 0 {
+	if len(s.subscription) != 0 {
 		t.Error("subscribers list should be empty")
 	}
 
